@@ -1,25 +1,13 @@
 import csv
 
 from django.contrib import admin, messages
-from django.urls import path, reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import path, reverse
 
 from .forms import IngredientsImportForm
-from .models import (
-    CountIngredients,
-    Recipe,
-    Tag,
-    Ingredient,
-    IngredientsImport,
-)
-
-
-@admin.register(Recipe)
-class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'author',)
-    search_fields = ('name',)
-    list_filter = ('name', 'author', 'tags',)
+from .models import (CountIngredients, Favorites, Follow, Ingredient,
+                     IngredientsImport, Recipe, ShopingCart, Tag)
 
 
 @admin.register(Ingredient)
@@ -41,8 +29,8 @@ class IngredientAdmin(admin.ModelAdmin):
                     rows = csv.reader(csv_file, delimiter=',')
                     for row in rows:
                         Ingredient.objects.update_or_create(
-                           name=row[0],
-                           measurement_unit=row[1]
+                            name=row[0],
+                            measurement_unit=row[1]
                         )
                 url = reverse('admin:index')
                 messages.success(request, 'Файл успешно импортирован')
@@ -56,9 +44,32 @@ class IngredientsImportAdmin(admin.ModelAdmin):
     list_display = ('csv_file', 'date_added',)
 
 
-@admin.register(CountIngredients)
-class CountIngredientAdmin(admin.ModelAdmin):
-    list_display = ('recipe', 'ingredient', 'amount')
+class CountIngredientsAdmin(admin.TabularInline):
+    model = CountIngredients
+
+
+@admin.register(Recipe)
+class RecipeAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'author',)
+    inlines = (CountIngredientsAdmin,)
+    search_fields = ('name', 'author', 'tags')
+    list_filter = ('name', 'author', 'tags',)
+    empty_value_display = '-пусто-'
 
 
 admin.site.register(Tag)
+
+
+@admin.register(Follow)
+class FollowAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'author',)
+
+
+@admin.register(Favorites)
+class FavoritesAdmin(admin.ModelAdmin):
+    list_display = ('id', 'user', 'recipe',)
+
+
+@admin.register(ShopingCart)
+class ShopingCart(admin.ModelAdmin):
+    list_display = ('id', 'user', 'recipe',)

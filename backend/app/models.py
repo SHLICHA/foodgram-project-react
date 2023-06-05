@@ -1,5 +1,5 @@
+from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
-from django.core.validators import RegexValidator
 
 from users.models import User
 
@@ -13,7 +13,8 @@ class Tag(models.Model):
     color = models.CharField(
         "Цвет тега",
         max_length=8,
-        null=True
+        null=True,
+        unique=True
     )
     slug = models.SlugField(
         max_length=200,
@@ -33,7 +34,7 @@ class Tag(models.Model):
         verbose_name_plural = "Теги"
 
     def __str__(self):
-        return self.name
+        return self.slug
 
 
 class Ingredient(models.Model):
@@ -79,7 +80,7 @@ class Recipe(models.Model):
         verbose_name="Теги",
     )
     cooking_time = models.IntegerField(
-        'Время приготовления в минутах',
+        'Время приготовления',
         default=0,
     )
     ingredients = models.ManyToManyField(
@@ -92,15 +93,17 @@ class Recipe(models.Model):
         max_length=10000,
         blank=True
     )
-
     count_add_favorite = models.IntegerField(
         "Количество добавление в избранное",
         default=0,
         null=True
     )
+    pub_date = models.DateTimeField(
+        'Дата публикации', auto_now_add=True
+    )
 
     class Meta:
-        ordering = ('name',)
+        ordering = ('-pub_date',)
         verbose_name = "Рецепт"
         verbose_name_plural = "Рецепты"
 
@@ -112,16 +115,18 @@ class CountIngredients(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        verbose_name="Рецепт"
+        verbose_name="Рецепт",
+        related_name='amount_ingredient'
     )
     ingredient = models.ForeignKey(
         Ingredient,
         on_delete=models.CASCADE,
-        verbose_name="Ингредиент"
+        verbose_name="Ингредиент",
+        related_name='amount_ingredient'
     )
     amount = models.IntegerField(
         "Количество ингредиента",
-        default=0,
+        validators=(MinValueValidator(1),),
     )
 
     class Meta:
@@ -138,3 +143,60 @@ class IngredientsImport(models.Model):
     class Meta:
         verbose_name = "История загрузки файлов"
         verbose_name_plural = "История загрузки файлов"
+
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        related_name='follower',
+        verbose_name='Подписчик',
+        on_delete=models.CASCADE
+    )
+    author = models.ForeignKey(
+        User,
+        related_name='following',
+        verbose_name='Автор',
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = "Подписка"
+        verbose_name_plural = "Подписки"
+
+
+class Favorites(models.Model):
+    user = models.ForeignKey(
+        User,
+        related_name='user',
+        verbose_name='Пользователь',
+        on_delete=models.CASCADE
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        related_name='favorite_recipe',
+        verbose_name='Избранный рецепт',
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = "Избранное"
+        verbose_name_plural = "Избранное"
+
+
+class ShopingCart(models.Model):
+    user = models.ForeignKey(
+        User,
+        related_name='buyer',
+        verbose_name='Пользователь',
+        on_delete=models.CASCADE
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        related_name='shoping_cart',
+        verbose_name='Избранный рецепт',
+        on_delete=models.CASCADE
+    )
+
+    class Meta:
+        verbose_name = "Корзина"
+        verbose_name_plural = "Корзина"
