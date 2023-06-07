@@ -50,7 +50,7 @@ class CountIngredientsAdmin(admin.TabularInline):
 
 @admin.register(Recipe)
 class RecipeAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'author',)
+    list_display = ('id', 'name', 'author', 'pub_date')
     inlines = (CountIngredientsAdmin,)
     search_fields = ('name', 'author', 'tags')
     list_filter = ('name', 'author', 'tags',)

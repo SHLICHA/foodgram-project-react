@@ -1,7 +1,9 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 
-from .views import (IngredientViewSet, RecipeViewSet, TagViewSet, UserViewSet,
+from .views import (IngredientViewSet, RecipeViewSet, TagViewSet,
                     get_favorite)
 
 router = DefaultRouter()
@@ -15,11 +17,13 @@ router.register(r"tags/(?P<tag_id>\d+)",
                 TagViewSet,
                 basename="tags"
                 )
-router.register('users', UserViewSet, basename="users")
 router.register('recipes', RecipeViewSet, basename="recipes")
 
 urlpatterns = [
     path("", include(router.urls)),
-    path("auth/", include('djoser.urls.authtoken')),
     path("favorites/", get_favorite),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)

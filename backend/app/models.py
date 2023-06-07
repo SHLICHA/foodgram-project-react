@@ -7,7 +7,7 @@ from users.models import User
 class Tag(models.Model):
     name = models.CharField(
         "Тег",
-        max_length=200,
+        max_length=50,
         unique=True
     )
     color = models.CharField(
@@ -17,7 +17,7 @@ class Tag(models.Model):
         unique=True
     )
     slug = models.SlugField(
-        max_length=200,
+        max_length=50,
         verbose_name="slug",
         unique=True,
         validators=[
@@ -44,13 +44,14 @@ class Ingredient(models.Model):
     )
     measurement_unit = models.CharField(
         "Единица измерения",
-        max_length=200
+        max_length=10
     )
 
     class Meta:
         ordering = ('name',)
         verbose_name = "Ингредиент"
         verbose_name_plural = "Ингредиенты"
+        unique_together = ('name', 'measurement_unit',)
 
     def __str__(self):
         return self.name
@@ -79,7 +80,7 @@ class Recipe(models.Model):
         Tag,
         verbose_name="Теги",
     )
-    cooking_time = models.IntegerField(
+    cooking_time = models.PositiveIntegerField(
         'Время приготовления',
         default=0,
     )
@@ -93,7 +94,7 @@ class Recipe(models.Model):
         max_length=10000,
         blank=True
     )
-    count_add_favorite = models.IntegerField(
+    count_add_favorite = models.PositiveIntegerField(
         "Количество добавление в избранное",
         default=0,
         null=True
@@ -124,7 +125,7 @@ class CountIngredients(models.Model):
         verbose_name="Ингредиент",
         related_name='amount_ingredient'
     )
-    amount = models.IntegerField(
+    amount = models.PositiveIntegerField(
         "Количество ингредиента",
         validators=(MinValueValidator(1),),
     )
@@ -133,6 +134,9 @@ class CountIngredients(models.Model):
         ordering = ('recipe',)
         verbose_name = "Количество ингредиентов"
         verbose_name_plural = "Количество ингредиентов"
+
+    def __str__(self):
+        return f'{self.recipe.name} {self.ingredient.name}'
 
 
 class IngredientsImport(models.Model):
@@ -162,12 +166,13 @@ class Follow(models.Model):
     class Meta:
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
+        unique_together = ('user', 'author',)
 
 
 class Favorites(models.Model):
     user = models.ForeignKey(
         User,
-        related_name='user',
+        related_name='favorite_user',
         verbose_name='Пользователь',
         on_delete=models.CASCADE
     )
@@ -181,6 +186,7 @@ class Favorites(models.Model):
     class Meta:
         verbose_name = "Избранное"
         verbose_name_plural = "Избранное"
+        unique_together = ('user', 'recipe',)
 
 
 class ShopingCart(models.Model):
