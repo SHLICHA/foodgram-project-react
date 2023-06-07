@@ -7,11 +7,9 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 
 from app.models import Follow
-from .serializers import (
-    UserSerializer,
-    ChangePasswordSerializer,
-    FollowSerializer
-)
+
+from .serializers import (ChangePasswordSerializer, FollowSerializer,
+                          UserSerializer)
 
 User = get_user_model()
 
