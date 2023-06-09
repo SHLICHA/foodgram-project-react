@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
+from django.db.models import UniqueConstraint
 
 from users.models import User
 
@@ -50,8 +51,9 @@ class Ingredient(models.Model):
     class Meta:
         ordering = ('name',)
         verbose_name = "Ингредиент"
-        verbose_name_plural = "Ингредиенты"
-        unique_together = ('name', 'measurement_unit',)
+        verbose_name_plural = "Ингредиенты",
+        UniqueConstraint(fields=['name', 'measurement_unit'],
+                         name='unique_ingredient')
 
     def __str__(self):
         return self.name
@@ -89,7 +91,7 @@ class Recipe(models.Model):
         verbose_name="Ингредиенты",
         through='CountIngredients'
     )
-    text = models.CharField(
+    text = models.TextField(
         'Описание рецепта',
         max_length=10000,
         blank=True
@@ -167,6 +169,8 @@ class Follow(models.Model):
         verbose_name = "Подписка"
         verbose_name_plural = "Подписки"
         unique_together = ('user', 'author',)
+        UniqueConstraint(fields=['user', 'author'],
+                         name='unique_follow')
 
 
 class Favorites(models.Model):
@@ -187,6 +191,8 @@ class Favorites(models.Model):
         verbose_name = "Избранное"
         verbose_name_plural = "Избранное"
         unique_together = ('user', 'recipe',)
+        UniqueConstraint(fields=['user', 'recipe'],
+                         name='unique_favorite')
 
 
 class ShopingCart(models.Model):
@@ -206,3 +212,5 @@ class ShopingCart(models.Model):
     class Meta:
         verbose_name = "Корзина"
         verbose_name_plural = "Корзина"
+    UniqueConstraint(fields=['user', 'recipe'],
+                     name='unique_recipe_in_shoping_cart')

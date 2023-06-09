@@ -1,8 +1,5 @@
-from os import remove
-
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
-from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status, viewsets
@@ -13,10 +10,10 @@ from rest_framework.response import Response
 
 from app.models import (CountIngredients, Favorites, Ingredient, Recipe,
                         ShopingCart, Tag)
-
 from .permissions import IsUserOwner
 from .serializers import (IngredientSerializer, RecipeMinifiedSerializer,
                           RecipeSerializer, TagSerializer)
+from .utils import file_creation
 
 User = get_user_model()
 
@@ -100,7 +97,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
             permission_classes=(IsAuthenticated,)
             )
     def getfile(self, request):
-        file_name = open("example.txt", "w+")
         shoping_carts = ShopingCart.objects.filter(
             user=request.user
         )
@@ -108,21 +104,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         shoping_list = (CountIngredients.objects.filter(recipe__in=recipes)
                         .values('ingredient')
                         .annotate(count=Sum("amount")))
-        for line_list in shoping_list:
-            ingredient = Ingredient.objects.get(pk=line_list['ingredient'])
-            file_name.write(f'{ingredient.name} '
-                            f'({ingredient.measurement_unit})'
-                            f' - {line_list["count"]}\n')
-        file_name.close()
-        read_file = open("example.txt", "r")
-        response = HttpResponse(read_file.read(),
-                                content_type="text/plain,charset=utf8"
-                                )
-        read_file.close()
-        message = 'attachment; filename="{}.txt"'.format('file_name')
-        response['Content-Disposition'] = message
-        remove("example.txt")
-        return response
+        return file_creation(shoping_list)
 
 
 @api_view(["GET"])

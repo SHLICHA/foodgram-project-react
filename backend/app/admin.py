@@ -23,7 +23,6 @@ class IngredientAdmin(admin.ModelAdmin):
         if request.method == 'POST':
             form = IngredientsImportForm(request.POST, request.FILES)
             if form.is_valid():
-                # реализация обработки формы
                 form_object = form.save()
                 with form_object.csv_file.open('r') as csv_file:
                     rows = csv.reader(csv_file, delimiter=',')

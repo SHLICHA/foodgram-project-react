@@ -78,9 +78,11 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags_pk = data.get('tags')
         if "cooking_time" not in data:
             errors.append('Добавьте время приготовления')
+        if data["cooking_time"] <= 0:
+            errors.append('Должно быть положительным числом')
         if tags_pk == []:
             errors.append('Добавьте теги')
-        elif tags_pk != set(tags_pk):
+        elif len(tags_pk) != len(set(tags_pk)):
             errors.append('Теги не уникальны')
         if errors:
             raise serializers.ValidationError(errors)
@@ -92,13 +94,13 @@ class RecipeSerializer(serializers.ModelSerializer):
         for ingredient in value:
             if ingredient.get('amount') <= 0:
                 raise ValidationError(
-                    'Добавьте количество ингредиента'
-                )
-        inrgedient_list = [
+                    f'Добавьте количество ингредиента {ingredient}'
+                )  
+        ingredient_list = [
             inrgedient['id'] for inrgedient in value
         ]
-        unique_ingredient_list = set(inrgedient_list)
-        if len(inrgedient_list) != len(unique_ingredient_list):
+        unique_ingredient_list = set(ingredient_list)
+        if len(ingredient_list) != len(unique_ingredient_list):
             raise serializers.ValidationError(
                 'Ингредиенты должны быть уникальными'
             )
@@ -166,17 +168,17 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         request = self.context["request"]
         user = request.user
-        if user.is_authenticated:
-            if user.favorite_user.filter(recipe=obj).exists():
-                return True
+        if (user.is_authenticated
+           and user.favorite_user.filter(recipe=obj).exists()):
+            return True
         return False
 
     def get_is_in_shopping_cart(self, obj):
         request = self.context["request"]
         user = request.user
-        if user.is_authenticated:
-            if user.buyer.filter(recipe=obj).exists():
-                return True
+        if (user.is_authenticated
+           and user.buyer.filter(recipe=obj).exists()):
+            return True
         return False
 
 

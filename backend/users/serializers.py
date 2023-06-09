@@ -3,9 +3,7 @@ from django.core.validators import MaxLengthValidator, RegexValidator
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
-import api
 from app.models import Follow, Recipe
-
 from .models import User
 
 
@@ -146,7 +144,8 @@ class FollowSerializer(UserSerializer):
         return author
 
     def get_recipes(self, obj):
-        return api.serializers.RecipeMinifiedSerializer(
+        from api.serializers import RecipeMinifiedSerializer
+        return RecipeMinifiedSerializer(
             Recipe.objects.filter(author=obj),
             many=True).data
 
