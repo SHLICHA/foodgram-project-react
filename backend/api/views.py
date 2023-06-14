@@ -95,7 +95,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe=recipe
         ).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
     @action(detail=False,
             methods=['post', 'delete'],
             url_path=r'(?P<id>\d+)/shopping_cart',
