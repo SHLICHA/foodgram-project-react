@@ -46,10 +46,4 @@ jobs:
         with:
           push: true
           context: ./backend
-          tags: shlicha/foodgram_backend:v1
-      - name: Push to Frontend to Docker Hub
-        uses: docker/build-push-action@v2 
-        with:
-          push: true
-          context: ../frontend
-          tags: shlicha/foodgram_fronend:v1    
+          tags: shlicha/foodgram_backend:v1  
