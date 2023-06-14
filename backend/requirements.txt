@@ -7,11 +7,13 @@ coreschema==0.0.4
 cryptography==40.0.2
 defusedxml==0.7.1
 Django==3.2.19
+django-extra-fields==3.0.2
 django-filter==23.2
 django-templated-mail==1.1.1
 djangorestframework==3.14.0
 djangorestframework-simplejwt==4.7.2
 djoser==2.1.0
+gunicorn==20.0.4
 flake8==6.0.0
 flake8-broken-line==1.0.0
 flake8-isort==6.0.0

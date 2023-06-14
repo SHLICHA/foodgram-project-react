@@ -95,7 +95,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             if ingredient.get('amount') <= 0:
                 raise ValidationError(
                     f'Добавьте количество ингредиента {ingredient}'
-                )  
+                )
         ingredient_list = [
             inrgedient['id'] for inrgedient in value
         ]

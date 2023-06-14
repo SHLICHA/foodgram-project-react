@@ -134,3 +134,4 @@ dmypy.json
 .uploads/
 frontend/
 media/
+.temp.txt

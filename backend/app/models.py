@@ -51,7 +51,7 @@ class Ingredient(models.Model):
     class Meta:
         ordering = ('name',)
         verbose_name = "Ингредиент"
-        verbose_name_plural = "Ингредиенты",
+        verbose_name_plural = "Ингредиенты"
         UniqueConstraint(fields=['name', 'measurement_unit'],
                          name='unique_ingredient')
 
@@ -139,16 +139,6 @@ class CountIngredients(models.Model):
 
     def __str__(self):
         return f'{self.recipe.name} {self.ingredient.name}'
-
-
-class IngredientsImport(models.Model):
-    """Хранение истории импортов"""
-    csv_file = models.FileField(upload_to='uploads/')
-    date_added = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        verbose_name = "История загрузки файлов"
-        verbose_name_plural = "История загрузки файлов"
 
 
 class Follow(models.Model):

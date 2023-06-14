@@ -10,6 +10,7 @@ from rest_framework.response import Response
 
 from app.models import (CountIngredients, Favorites, Ingredient, Recipe,
                         ShopingCart, Tag)
+from .filters import IngredientFilter
 from .permissions import IsUserOwner
 from .serializers import (IngredientSerializer, RecipeMinifiedSerializer,
                           RecipeSerializer, TagSerializer)
@@ -21,7 +22,11 @@ User = get_user_model()
 class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
+    permission_classes = (AllowAny,)
     pagination_class = None
+    filter_backends = (DjangoFilterBackend, )
+    filterset_class = IngredientFilter
+    # search_fields = ('^name')
 
 
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
@@ -86,6 +91,29 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 return Response(serializer.data,
                                 status=status.HTTP_201_CREATED)
         Favorites.objects.filter(
+            user=user,
+            recipe=recipe
+        ).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+    @action(detail=False,
+            methods=['post', 'delete'],
+            url_path=r'(?P<id>\d+)/shopping_cart',
+            permission_classes=(IsAuthenticated,)
+            )
+    def food_basket(self, request, *args, **kwargs):
+        recipe = get_object_or_404(Recipe, pk=kwargs.get('id'))
+        user = self.request.user
+        if request.method == "POST":
+            ShopingCart.objects.get_or_create(
+                user=user,
+                recipe=recipe
+            )
+            serializer = RecipeMinifiedSerializer(recipe, data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                return Response(serializer.data,
+                                status=status.HTTP_201_CREATED)
+        ShopingCart.objects.filter(
             user=user,
             recipe=recipe
         ).delete()
