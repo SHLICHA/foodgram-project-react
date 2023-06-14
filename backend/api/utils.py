@@ -1,9 +1,8 @@
 from os import remove
 
+from app.models import Ingredient
 from django.contrib.auth import get_user_model
 from django.http import HttpResponse
-
-from app.models import Ingredient
 
 User = get_user_model()
 
