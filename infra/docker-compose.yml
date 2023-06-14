@@ -24,7 +24,7 @@ services:
     #build:
     #  context: ../frontend
     #  dockerfile: Dockerfile
-    image: shlicha/foodgram_frontend:v1
+    image: shlicha/foodgram_fronend:v1
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
