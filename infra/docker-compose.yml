@@ -8,7 +8,8 @@ services:
     env_file:
       - ../.env
   web:
-    build: ../backend
+    #build: ../backend
+    image: shlicha/foodgram_backend:v1
     restart: always
     volumes:
       - ../frontend/build://app/static/
@@ -20,9 +21,10 @@ services:
     env_file:
       - ../.env
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    #build:
+    #  context: ../frontend
+    #  dockerfile: Dockerfile
+    image: shlicha/foodgram_frontend:v1
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:

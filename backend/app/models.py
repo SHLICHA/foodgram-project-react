@@ -161,6 +161,9 @@ class Follow(models.Model):
         UniqueConstraint(fields=['user', 'author'],
                          name='unique_follow')
 
+    def __str__(self):
+        return f'{self.user.name} {self.author.name}'
+
 
 class Favorites(models.Model):
     user = models.ForeignKey(
@@ -183,6 +186,9 @@ class Favorites(models.Model):
         UniqueConstraint(fields=['user', 'recipe'],
                          name='unique_favorite')
 
+    def __str__(self):
+        return f'{self.user.name} {self.recipe.name}'
+
 
 class ShopingCart(models.Model):
     user = models.ForeignKey(
@@ -203,3 +209,6 @@ class ShopingCart(models.Model):
         verbose_name_plural = "Корзина"
     UniqueConstraint(fields=['user', 'recipe'],
                      name='unique_recipe_in_shoping_cart')
+
+    def __str__(self):
+        return f'{self.user.name} {self.author.name}'
