@@ -85,7 +85,7 @@ class UserSerializer(serializers.ModelSerializer):
         if request:
             current_user = request.user
             return (current_user.is_authenticated
-                    and current_user.following.filter(author=obj).exists())
+                    and current_user.follower.filter(author=obj).exists())
         return False
 
 
@@ -151,3 +151,11 @@ class FollowSerializer(UserSerializer):
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
+    
+    def get_is_subscribed(self, obj):
+        request = self.context.get('request', None)
+        if request:
+            current_user = request.user
+            return (current_user.is_authenticated
+                    and current_user.follower.filter(author=obj).exists())
+        return False
