@@ -28,10 +28,22 @@ class UserSerializer(serializers.ModelSerializer):
     )
     is_subscribed = serializers.SerializerMethodField(read_only=True)
 
+    def validate(self, data):
+        data['email'] = data['email'].lower()
+        if data.get("username").lower() == "me":
+            raise serializers.ValidationError("Запрещенный логин")
+        if User.objects.filter(username=data.get("username")):
+            raise serializers.ValidationError(
+                "Пользователь с таким username уже существует"
+            )
+        if User.objects.filter(email=data.get("email")):
+            raise serializers.ValidationError(
+                "Пользователь с таким email уже существует"
+            )
+        return data
+
     def create(self, validated_data):
         user = User.objects.create_user(**validated_data)
-        email = user.email.lower()
-        user.email = email
         user.set_password(validated_data['password'])
         user.save()
         return user
@@ -47,20 +59,6 @@ class UserSerializer(serializers.ModelSerializer):
         )
         instance.save()
         return instance
-
-    def validate(self, data):
-        data['email'] = data['email'].lower()
-        if data.get("username").lower() == "me":
-            raise serializers.ValidationError("Запрещенный логин")
-        if User.objects.filter(username=data.get("username")):
-            raise serializers.ValidationError(
-                "Пользователь с таким username уже существует"
-            )
-        if User.objects.filter(email=data.get("email")):
-            raise serializers.ValidationError(
-                "Пользователь с таким email уже существует"
-            )
-        return data
 
     class Meta:
         model = User
