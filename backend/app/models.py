@@ -162,7 +162,7 @@ class Follow(models.Model):
                          name='unique_follow')
 
     def __str__(self):
-        return f'{self.user.username} {self.author.name}'
+        return f'{self.user.username} {self.author.username}'
 
 
 class Favorites(models.Model):

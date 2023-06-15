@@ -15,11 +15,6 @@ User = get_user_model()
 
 
 class UserViewSet(UserViewSet):
-    """Работа администратора с данными пользователей.
-    Создание, изменение, удаление. Ссылка ../users/{username}/ - страница
-    пользователя для работы. На вход приходит username пользователя.
-    ../users/ - получение списка пользователей"""
-
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = PageNumberPagination
@@ -111,9 +106,7 @@ class UserViewSet(UserViewSet):
         recipes_limit = self.request.query_params.get('recipes_limit')
         if recipes_limit:
             queryset = queryset.filter(recipe_count__lte=recipes_limit)
-        serializer = FollowSerializer(queryset,
-                                      many=True,
-                                      data=request.data,
-                                      context={'request': request}
+        serializer = FollowSerializer(queryset, many=True,
+                                      context={'request': request, }
                                       )
         return Response(serializer.data)
