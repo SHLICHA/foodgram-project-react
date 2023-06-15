@@ -119,6 +119,7 @@ class FollowSerializer(UserSerializer):
     last_name = serializers.ReadOnlyField()
     recipes = serializers.SerializerMethodField(read_only=True)
     recipes_count = serializers.SerializerMethodField(read_only=True)
+    is_subscribed = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = User
