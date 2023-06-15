@@ -111,5 +111,9 @@ class UserViewSet(UserViewSet):
         recipes_limit = self.request.query_params.get('recipes_limit')
         if recipes_limit:
             queryset = queryset.filter(recipe_count__lte=recipes_limit)
-        serializer = FollowSerializer(queryset, many=True)
+        serializer = FollowSerializer(queryset,
+                                      many=True,
+                                      data=request.data,
+                                      context={'request': request}
+                                      )
         return Response(serializer.data)
