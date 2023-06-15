@@ -20,7 +20,6 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class CountIngredientsSerializer(serializers.ModelSerializer):
-    #id = serializers.ReadOnlyField(source='ingredient.pk')
     id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(

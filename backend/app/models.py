@@ -65,7 +65,6 @@ class Recipe(models.Model):
         max_length=200,
         verbose_name="Название рецепта",
         db_index=True,
-        #unique=True
     )
     author = models.ForeignKey(
         User,
