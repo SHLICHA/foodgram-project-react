@@ -1,7 +1,7 @@
 from app.models import Follow
 from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
-from djoser.views import UserViewSet
+from djoser.views import UserViewSet, viewsets
 from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -14,7 +14,7 @@ from .serializers import (ChangePasswordSerializer, FollowSerializer,
 User = get_user_model()
 
 
-class UserViewSet(UserViewSet):
+class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     pagination_class = PageNumberPagination
@@ -22,8 +22,8 @@ class UserViewSet(UserViewSet):
     permission_classes = [AllowAny, ]
 
     def perform_create(self, serializer):
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
         return Response(
             serializer.validated_data, status=status.HTTP_201_CREATED
         )
@@ -96,7 +96,7 @@ class UserViewSet(UserViewSet):
     @action(detail=False,
             methods=['get'],
             url_path='subscriptions',
-            permission_classes=(IsAuthenticated,)
+            permission_classes=(IsAuthenticated,),
             )
     def subscriptions(self, request):
         user = self.request.user
@@ -107,6 +107,6 @@ class UserViewSet(UserViewSet):
         if recipes_limit:
             queryset = queryset.filter(recipe_count__lte=recipes_limit)
         serializer = FollowSerializer(queryset, many=True,
-                                      context={'request': request, }
+                                      context={'request': request, },
                                       )
         return Response(serializer.data)

@@ -52,7 +52,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 pk__in=Favorites.objects.filter(user=user)
                 .values('recipe')
             )
-        if self.request.query_params.get('is_in_shoping_cart'):
+        if self.request.query_params.get('is_in_shopping_cart'):
             queryset = queryset.filter(
                 pk__in=ShopingCart.objects.filter(user=user)
                 .values('recipe')
@@ -77,16 +77,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
             url_path=r'(?P<id>\d+)/favorite',
             permission_classes=(IsAuthenticated,)
             )
-    def subscribe(self, request, *args, **kwargs):
+    def add_favorites(self, request, *args, **kwargs):
         recipe = get_object_or_404(Recipe, pk=kwargs.get('id'))
         user = self.request.user
         if request.method == "POST":
-            Favorites.objects.get_or_create(
-                user=user,
-                recipe=recipe
-            )
             serializer = RecipeMinifiedSerializer(recipe, data=request.data)
             if serializer.is_valid(raise_exception=True):
+                Favorites.objects.get_or_create(
+                    user=user,
+                    recipe=recipe
+                )
                 return Response(serializer.data,
                                 status=status.HTTP_201_CREATED)
         Favorites.objects.filter(
@@ -100,16 +100,16 @@ class RecipeViewSet(viewsets.ModelViewSet):
             url_path=r'(?P<id>\d+)/shopping_cart',
             permission_classes=(IsAuthenticated,)
             )
-    def food_basket(self, request, *args, **kwargs):
+    def add_shopping_cart(self, request, *args, **kwargs):
         recipe = get_object_or_404(Recipe, pk=kwargs.get('id'))
         user = self.request.user
         if request.method == "POST":
-            ShopingCart.objects.get_or_create(
-                user=user,
-                recipe=recipe
-            )
             serializer = RecipeMinifiedSerializer(recipe, data=request.data)
             if serializer.is_valid(raise_exception=True):
+                ShopingCart.objects.get_or_create(
+                    user=user,
+                    recipe=recipe
+                )
                 return Response(serializer.data,
                                 status=status.HTTP_201_CREATED)
         ShopingCart.objects.filter(

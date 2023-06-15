@@ -65,7 +65,7 @@ class Recipe(models.Model):
         max_length=200,
         verbose_name="Название рецепта",
         db_index=True,
-        unique=True
+        #unique=True
     )
     author = models.ForeignKey(
         User,
@@ -200,15 +200,15 @@ class ShopingCart(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         related_name='shoping_cart',
-        verbose_name='Избранный рецепт',
+        verbose_name='Рецепт в корзине',
         on_delete=models.CASCADE
     )
 
     class Meta:
         verbose_name = "Корзина"
         verbose_name_plural = "Корзина"
-    UniqueConstraint(fields=['user', 'recipe'],
-                     name='unique_recipe_in_shoping_cart')
+        UniqueConstraint(fields=['user', 'recipe'],
+                         name='unique_recipe_in_shoping_cart')
 
     def __str__(self):
-        return f'{self.user.username} {self.author.name}'
+        return f'{self.user.username} {self.recipe.name}'

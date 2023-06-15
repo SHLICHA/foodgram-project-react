@@ -15,13 +15,11 @@ class UserSerializer(serializers.ModelSerializer):
                 message="Некорректный логин",
             ),
             MaxLengthValidator(150, "Логин слишком длинный"),
-            UniqueValidator(queryset=User.objects.all()),
         ],
         required=True
     )
     email = serializers.EmailField(
         validators=[
-            UniqueValidator(queryset=User.objects.all()),
             MaxLengthValidator(254, "Адрес слишком длинный"),
         ],
         required=True
@@ -32,7 +30,7 @@ class UserSerializer(serializers.ModelSerializer):
         data['email'] = data['email'].lower()
         if data.get("username").lower() == "me":
             raise serializers.ValidationError("Запрещенный логин")
-        if User.objects.filter(username=data.get("username")):
+        if User.objects.filter(username=data.get("username").lower()):
             raise serializers.ValidationError(
                 "Пользователь с таким username уже существует"
             )
@@ -82,11 +80,10 @@ class UserSerializer(serializers.ModelSerializer):
 
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
-        print(obj.pk, request)
         if request:
             current_user = request.user
-            print(current_user.follower.filter(author=obj))
-            return current_user.follower.filter(author=obj).exists()
+            if current_user.is_authenticated:
+                return current_user.follower.filter(author=obj).exists()
         return False
 
 

@@ -20,7 +20,8 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class CountIngredientsSerializer(serializers.ModelSerializer):
-    id = serializers.ReadOnlyField(source='ingredient.pk')
+    #id = serializers.ReadOnlyField(source='ingredient.pk')
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit'
@@ -73,18 +74,20 @@ class RecipeSerializer(serializers.ModelSerializer):
         return internal_data
 
     def validate(self, data):
-        errors = []
         tags_pk = data.get('tags')
+        print(data.get("name"))
         if "cooking_time" not in data:
-            errors.append('Добавьте время приготовления')
-        if data["cooking_time"] <= 0:
-            errors.append('Должно быть положительным числом')
+            raise serializers.ValidationError('Добавьте время приготовления')
+        if Recipe.objects.filter(name=data.get("name")).exists():
+            raise serializers.ValidationError(
+                'Рецепт с таким названием уже существует')
+        if data.get("cooking_time") <= 0:
+            raise serializers.ValidationError(
+                'Должно быть положительным числом')
         if tags_pk == []:
-            errors.append('Добавьте теги')
-        elif len(tags_pk) != len(set(tags_pk)):
-            errors.append('Теги не уникальны')
-        if errors:
-            raise serializers.ValidationError(errors)
+            raise serializers.ValidationError('Добавьте теги')
+        if len(tags_pk) != len(set(tags_pk)):
+            raise serializers.ValidationError('Теги не уникальны')
         return data
 
     def validate_ingredients(self, value):
@@ -96,7 +99,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                     f'Добавьте количество ингредиента {ingredient}'
                 )
         ingredient_list = [
-            inrgedient['id'] for inrgedient in value
+            ingredient.get('id') for ingredient in value
         ]
         unique_ingredient_list = set(ingredient_list)
         if len(ingredient_list) != len(unique_ingredient_list):
