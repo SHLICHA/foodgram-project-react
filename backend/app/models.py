@@ -162,7 +162,7 @@ class Follow(models.Model):
                          name='unique_follow')
 
     def __str__(self):
-        return f'{self.user.name} {self.author.name}'
+        return f'{self.user.username} {self.author.name}'
 
 
 class Favorites(models.Model):
@@ -187,7 +187,7 @@ class Favorites(models.Model):
                          name='unique_favorite')
 
     def __str__(self):
-        return f'{self.user.name} {self.recipe.name}'
+        return f'{self.user.username} {self.recipe.name}'
 
 
 class ShopingCart(models.Model):
@@ -211,4 +211,4 @@ class ShopingCart(models.Model):
                      name='unique_recipe_in_shoping_cart')
 
     def __str__(self):
-        return f'{self.user.name} {self.author.name}'
+        return f'{self.user.username} {self.author.name}'
