@@ -81,14 +81,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, pk=kwargs.get('id'))
         user = self.request.user
         if request.method == "POST":
-            serializer = RecipeMinifiedSerializer(recipe, data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                Favorites.objects.get_or_create(
-                    user=user,
-                    recipe=recipe
-                )
-                return Response(serializer.data,
-                                status=status.HTTP_201_CREATED)
+            serializer = RecipeMinifiedSerializer(recipe)
+            Favorites.objects.get_or_create(
+                user=user,
+                recipe=recipe
+            )
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
         Favorites.objects.filter(
             user=user,
             recipe=recipe
@@ -104,14 +103,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
         recipe = get_object_or_404(Recipe, pk=kwargs.get('id'))
         user = self.request.user
         if request.method == "POST":
-            serializer = RecipeMinifiedSerializer(recipe, data=request.data)
-            if serializer.is_valid(raise_exception=True):
-                ShopingCart.objects.get_or_create(
-                    user=user,
-                    recipe=recipe
-                )
-                return Response(serializer.data,
-                                status=status.HTTP_201_CREATED)
+            serializer = RecipeMinifiedSerializer(recipe)
+            ShopingCart.objects.get_or_create(
+                user=user,
+                recipe=recipe
+            )
+            return Response(serializer.data,
+                            status=status.HTTP_201_CREATED)
         ShopingCart.objects.filter(
             user=user,
             recipe=recipe

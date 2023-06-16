@@ -111,6 +111,7 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class FollowSerializer(UserSerializer):
     email = serializers.ReadOnlyField()
+    id = serializers.ReadOnlyField()
     username = serializers.ReadOnlyField()
     first_name = serializers.ReadOnlyField()
     last_name = serializers.ReadOnlyField()

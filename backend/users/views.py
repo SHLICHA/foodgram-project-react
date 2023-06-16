@@ -98,15 +98,20 @@ class UserViewSet(viewsets.ModelViewSet):
             url_path='subscriptions',
             permission_classes=(IsAuthenticated,),
             )
-    def subscriptions(self, request):
-        user = self.request.user
-        followings = Follow.objects.filter(user=user)
-        query_author = [i.author for i in followings]
-        queryset = User.objects.filter(username__in=query_author)
-        recipes_limit = self.request.query_params.get('recipes_limit')
-        if recipes_limit:
-            queryset = queryset.filter(recipe_count__lte=recipes_limit)
-        serializer = FollowSerializer(queryset, many=True,
-                                      context={'request': request, },
-                                      )
-        return Response(serializer.data)
+    def show_subscriptions(self, request):
+        queryset = User.objects.filter(following__user=request.user)
+        page = self.paginate_queryset(queryset)
+        serializer = FollowSerializer(
+            page,
+            many=True,
+            context={
+                'request': request,
+                'subscriptions': set(
+                    Follow.objects.filter(
+                        user_id=self.request.user).values_list(
+                            "author_id",
+                            flat=True)
+                ),
+            },
+        )
+        return self.get_paginated_response(serializer.data)

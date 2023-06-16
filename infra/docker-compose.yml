@@ -7,6 +7,7 @@ services:
       - db_value:/var/lib/postgresql/data/
     env_file:
       - ./.env
+
   web:
     image: shlicha/foodgram_backend:v1
     restart: always
@@ -19,12 +20,14 @@ services:
       - db
     env_file:
       - ./.env
+
   frontend:
     image: shlicha/foodgram_fronend:v1
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
       - web
+
   nginx:
     image: nginx:1.19.3
     ports:
@@ -36,7 +39,6 @@ services:
       - static_value:/var/html/static/
       - media_value:/var/html/media/
     depends_on:
-      - web
       - frontend
 
 volumes:

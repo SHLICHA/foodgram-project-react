@@ -180,7 +180,7 @@ class RecipeSerializer(serializers.ModelSerializer):
 
 
 class RecipeMinifiedSerializer(serializers.ModelSerializer):
-    image = Base64ImageField(allow_null=True)
+    image = Base64ImageField(allow_null=False)
 
     class Meta:
         model = Recipe
