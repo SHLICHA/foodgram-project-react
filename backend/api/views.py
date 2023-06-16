@@ -127,8 +127,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
         )
         recipes = [i.recipe.id for i in shoping_carts]
         shoping_list = (CountIngredients.objects.filter(recipe__in=recipes)
+                        .order_by('ingredient')
                         .values('ingredient')
-                        .annotate(count=Sum("amount")))
+                        .annotate(count=Sum("amount"))
+                        )
         return file_creation(shoping_list)
 
 

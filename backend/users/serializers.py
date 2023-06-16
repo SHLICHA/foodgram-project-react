@@ -143,8 +143,13 @@ class FollowSerializer(UserSerializer):
 
     def get_recipes(self, obj):
         from api.serializers import RecipeMinifiedSerializer
+        recipes_limit = None
+        if self.context["request"].query_params.get('recipes_limit'):
+            recipes_limit = int(
+                self.context["request"].query_params.get('recipes_limit')
+            )
         return RecipeMinifiedSerializer(
-            Recipe.objects.filter(author=obj),
+            Recipe.objects.filter(author=obj)[:recipes_limit],
             many=True).data
 
     def get_recipes_count(self, obj):

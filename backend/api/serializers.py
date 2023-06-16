@@ -74,7 +74,6 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate(self, data):
         tags_pk = data.get('tags')
-        print(data.get("name"))
         if "cooking_time" not in data:
             raise serializers.ValidationError('Добавьте время приготовления')
         if Recipe.objects.filter(name=data.get("name")).exists():

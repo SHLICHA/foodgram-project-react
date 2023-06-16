@@ -135,8 +135,8 @@ class CountIngredients(models.Model):
         verbose_name = "Количество ингредиентов"
         verbose_name_plural = "Количество ингредиентов"
 
-    def __str__(self):
-        return f'{self.recipe.name} {self.ingredient.name}'
+    #def __str__(self):
+    #    return self.ingredient.name
 
 
 class Follow(models.Model):
