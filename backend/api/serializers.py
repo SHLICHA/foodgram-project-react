@@ -20,7 +20,8 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class CountIngredientsSerializer(serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all())
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredient.objects.all(),
+                                            source='ingredient.id')
     name = serializers.ReadOnlyField(source='ingredient.name')
     measurement_unit = serializers.ReadOnlyField(
         source='ingredient.measurement_unit'
@@ -76,9 +77,6 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags_pk = data.get('tags')
         if "cooking_time" not in data:
             raise serializers.ValidationError('Добавьте время приготовления')
-        if Recipe.objects.filter(name=data.get("name")).exists():
-            raise serializers.ValidationError(
-                'Рецепт с таким названием уже существует')
         if data.get("cooking_time") <= 0:
             raise serializers.ValidationError(
                 'Должно быть положительным числом')
@@ -97,12 +95,12 @@ class RecipeSerializer(serializers.ModelSerializer):
                     f'Добавьте количество ингредиента {ingredient}'
                 )
         ingredient_list = [
-            ingredient.get('id') for ingredient in value
+            ingredient['ingredient'].get('id') for ingredient in value
         ]
         unique_ingredient_list = set(ingredient_list)
         if len(ingredient_list) != len(unique_ingredient_list):
             raise serializers.ValidationError(
-                'Ингредиенты должны быть уникальными'
+                'Ингредиенты должны быть уникальны'
             )
         return value
 
@@ -131,7 +129,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         objs = [
             CountIngredients(
                 recipe=recipe,
-                ingredient=ingredient_data['id'],
+                ingredient=ingredient_data['ingredient'].get('id'),
                 amount=ingredient_data['amount']
             )
             for ingredient_data in ingredients_data
@@ -150,18 +148,17 @@ class RecipeSerializer(serializers.ModelSerializer):
         tags_data = validated_data.pop('tags')
         instance.tags.set(tags_data)
         instance.save()
-        CountIngredients.objects.filter(recipe_id=instance.id).delete()
         ingredients_data = validated_data.pop('amount_ingredient')
         recipe = Recipe.objects.get(pk=instance.id)
-        CountIngredients.objects.filter(recipe=recipe).delete()
         objs = [
             CountIngredients(
                 recipe=recipe,
-                ingredient=ingredien_data['id'],
-                amount=ingredien_data['amount']
+                ingredient=ingredient_data['ingredient'].get('id'),
+                amount=ingredient_data['amount']
             )
-            for ingredien_data in ingredients_data
+            for ingredient_data in ingredients_data
         ]
+        CountIngredients.objects.filter(recipe=recipe).delete()
         CountIngredients.objects.bulk_create(objs)
         return instance
 

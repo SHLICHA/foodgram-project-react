@@ -65,6 +65,7 @@ class Recipe(models.Model):
         max_length=200,
         verbose_name="Название рецепта",
         db_index=True,
+        unique=True
     )
     author = models.ForeignKey(
         User,
@@ -135,8 +136,8 @@ class CountIngredients(models.Model):
         verbose_name = "Количество ингредиентов"
         verbose_name_plural = "Количество ингредиентов"
 
-    #def __str__(self):
-    #    return self.ingredient.name
+    def __str__(self):
+        return self.ingredient.name
 
 
 class Follow(models.Model):
