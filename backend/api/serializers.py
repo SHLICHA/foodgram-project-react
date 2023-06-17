@@ -88,10 +88,10 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def validate_ingredients(self, value):
         if not value:
-            raise ValidationError('Добавьте ингредиенты')
+            raise serializers.ValidationError('Добавьте ингредиенты')
         for ingredient in value:
             if ingredient.get('amount') <= 0:
-                raise ValidationError(
+                raise serializers.ValidationError(
                     f'Добавьте количество ингредиента {ingredient}'
                 )
         ingredient_list = [
