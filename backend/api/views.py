@@ -47,6 +47,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         queryset = Recipe.objects.all()
         tags = self.request.query_params.getlist('tags')
         author = self.request.query_params.getlist('author')
+        if tags:
+            queryset = Recipe.objects.filter(tags__slug__in=tags).distinct()
         if self.request.query_params.get('is_favorited'):
             queryset = queryset.filter(
                 pk__in=Favorites.objects.filter(user=user)
@@ -57,8 +59,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 pk__in=ShopingCart.objects.filter(user=user)
                 .values('recipe')
             )
-        if tags:
-            queryset = Recipe.objects.filter(tags__slug__in=tags).distinct()
         if author:
             queryset = queryset.filter(author__pk__in=author)
         return queryset
@@ -68,9 +68,11 @@ class RecipeViewSet(viewsets.ModelViewSet):
         serializer.save(author=user)
         user.recipe_count = Recipe.objects.filter(author=user).count()
         user.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     def perform_update(self, serializer):
         serializer.save(author=self.request.user)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
     @action(detail=False,
             methods=['post', 'delete'],
