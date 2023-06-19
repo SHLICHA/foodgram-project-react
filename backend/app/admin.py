@@ -18,7 +18,7 @@ class CountIngredientsAdmin(admin.TabularInline):
 class RecipeAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'author', 'pub_date')
     inlines = (CountIngredientsAdmin,)
-    search_fields = ('name', 'author', 'tags')
+    search_fields = ('name',)
     list_filter = ('author', 'tags',)
     empty_value_display = '-пусто-'
 
