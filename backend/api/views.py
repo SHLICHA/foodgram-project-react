@@ -58,7 +58,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                 .values('recipe')
             )
         if tags:
-            queryset = queryset.filter(tags__slug__in=tags)
+            queryset = Recipe.objects.filter(tags__slug__in=tags).distinct()
         if author:
             queryset = queryset.filter(author__pk__in=author)
         return queryset
